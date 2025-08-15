@@ -1,12 +1,12 @@
 body {
     margin: 0;
     overflow: hidden;
-    background: linear-gradient(#87ceeb, #ffffff); 
+    background: black;
     font-family: Arial, sans-serif;
 }
 
 canvas {
     display: block;
     margin: 0 auto;
-    background: #87ceeb;
+    background: black;
 }
