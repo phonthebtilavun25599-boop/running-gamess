@@ -1,7 +1,8 @@
 body {
     margin: 0;
     overflow: hidden;
-    background: #87ceeb;
+    background: linear-gradient(#87ceeb, #ffffff); 
+    font-family: Arial, sans-serif;
 }
 
 canvas {
