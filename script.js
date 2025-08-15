@@ -6,65 +6,91 @@ canvas.height = 400;
 
 let player = {
     x: 50,
-    y: canvas.height - 60,
+    y: canvas.height / 2,
     width: 40,
-    height: 50,
+    height: 30,
     dy: 0,
-    gravity: 1,
-    jumpPower: -15,
-    onGround: true,
-    color: '#ff4d4d'
+    gravity: 0.5,
+    lift: -10,
+    onScreen: true,
+    color: '#00ffff'
 };
 
 let obstacles = [];
+let stars = [];
 let obstacleTimer = 0;
 let speed = 5;
 let level = 1;
 let score = 0;
-let groundHeight = 60;
 
+for (let i = 0; i < 100; i++) {
+    stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2 + 1,
+        speed: Math.random() * 1 + 0.2
+    });
+}
 function createObstacle() {
     let size = Math.random() * 30 + 20 + level * 5;
     obstacles.push({
         x: canvas.width,
-        y: canvas.height - size - groundHeight,
+        y: Math.random() * (canvas.height - size),
         width: size,
         height: size,
-        color: '#28a745'
+        color: '#ff4500'
     });
 }
-function drawGround() {
-    ctx.fillStyle = '#654321';
-    ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+function drawStars() {
+    ctx.fillStyle = 'white';
+    stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+function updateStars() {
+    stars.forEach(star => {
+        star.x -= star.speed;
+        if (star.x < 0) star.x = canvas.width;
+    });
 }
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    drawGround();
 
+    drawStars();
+    
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
-
+    
     obstacles.forEach(obs => {
         ctx.fillStyle = obs.color;
         ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
     });
-    ctx.fillStyle = 'black';
+
+    ctx.fillStyle = 'white';
     ctx.font = '20px Arial';
     ctx.fillText('Score: ' + score, 10, 30);
     ctx.fillText('Level: ' + level, 10, 60);
 }
 function update() {
+    updateStars();
+
     player.dy += player.gravity;
     player.y += player.dy;
 
-    if (player.y + player.height >= canvas.height - groundHeight) {
-        player.y = canvas.height - groundHeight - player.height;
+    if (player.y + player.height > canvas.height) {
+        player.y = canvas.height - player.height;
         player.dy = 0;
-        player.onGround = true;
+    } 
+    if (player.y < 0) {
+        player.y = 0;
+        player.dy = 0;
     }
     obstacles.forEach(obs => obs.x -= speed);
+
     obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
+
     obstacleTimer++;
     if (obstacleTimer > 90) {
         createObstacle();
@@ -88,9 +114,8 @@ function update() {
     }
 }
 document.addEventListener('keydown', e => {
-    if (e.code === 'Space' && player.onGround) {
-        player.dy = player.jumpPower;
-        player.onGround = false;
+    if (e.code === 'Space') {
+        player.dy = player.lift;
     }
 });
 function gameLoop() {
